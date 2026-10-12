@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>Snake Game</title>
+    <meta name="description" content="Classic arcade Snake Game playable on desktop and mobile browsers, ready for static deployment on GitHub Pages." />
+    
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Snake Game" />
+    <meta property="og:description" content="Classic arcade Snake Game playable on desktop and mobile browsers, ready for static deployment on GitHub Pages." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Snake Game" />
+    <meta name="twitter:description" content="Classic arcade Snake Game playable on desktop and mobile browsers, ready for static deployment on GitHub Pages." />
+    
+    <!-- Theme & Mobile App Colors -->
+    <meta name="theme-color" content="#0a0f1d" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230a0f1d'/><circle cx='40' cy='50' r='20' fill='%2310b981'/><circle cx='60' cy='50' r='18' fill='%23059669'/><circle cx='70' cy='46' r='4' fill='%23ffffff'/><circle cx='72' cy='46' r='2' fill='%230f172a'/><circle cx='25' cy='35' r='10' fill='%23ef4444'/></svg>" />
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Game Top Header -->
+      <header class="game-header">
+        <div class="brand">
+          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a10 10 0 100 20 10 10 0 000-20zm-2 9a2 2 0 114 0 2 2 0 01-4 0z" />
+          </svg>
+          <h1 class="brand-title">SNAKE <span class="badge">RETRO</span></h1>
+        </div>
+
+        <div class="header-actions">
+          <button id="sound-toggle-btn" class="icon-btn active" title="Toggle Sound" aria-label="Toggle Sound">
+            <!-- Sound On Icon -->
+            <svg id="icon-sound-on" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+            <!-- Sound Off Icon -->
+            <svg id="icon-sound-off" style="display: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <line x1="23" y1="9" x2="17" y2="15"></line>
+              <line x1="17" y1="9" x2="23" y2="15"></line>
+            </svg>
+          </button>
+
+          <button id="help-btn" class="icon-btn" title="How to Play" aria-label="Help">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Score Boards -->
+      <section class="score-panel" aria-label="Score board">
+        <div class="score-box">
+          <span class="score-label">Score</span>
+          <span id="current-score" class="score-value">0</span>
+        </div>
+        <div class="score-box high-score">
+          <span class="score-label">Best Record</span>
+          <span id="high-score" class="score-value">0</span>
+        </div>
+      </section>
+
+      <!-- Game Board Container -->
+      <main class="board-container" id="board-container">
+        <!-- Bonus Fruit Timer Progress Bar -->
+        <div id="bonus-timer-wrap" class="bonus-timer-bar-wrap">
+          <div id="bonus-timer-bar" class="bonus-timer-bar"></div>
+        </div>
+
+        <!-- Canvas -->
+        <canvas id="game-canvas" width="400" height="400"></canvas>
+
+        <!-- Start Overlay -->
+        <div id="start-overlay" class="overlay active">
+          <h2 class="overlay-title">CLASSIC SNAKE</h2>
+          <p class="overlay-subtitle">Navigate the snake, collect apples, and beat your high score without crashing!</p>
+          
+          <div class="difficulty-selector" role="radiogroup" aria-label="Game Speed">
+            <button class="diff-btn" data-diff="easy">Casual</button>
+            <button class="diff-btn active" data-diff="normal">Classic</button>
+            <button class="diff-btn" data-diff="hard">Speedrun</button>
+          </div>
+
+          <button id="start-btn" class="btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            Start Game
+          </button>
+        </div>
+
+        <!-- Pause Overlay -->
+        <div id="pause-overlay" class="overlay">
+          <h2 class="overlay-title">PAUSED</h2>
+          <p class="overlay-subtitle">Take a breather. Press Space or tap resume to jump back in.</p>
+          <button id="resume-btn" class="btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            Resume
+          </button>
+        </div>
+
+        <!-- Game Over Overlay -->
+        <div id="game-over-overlay" class="overlay">
+          <h2 class="overlay-title game-over-title">GAME OVER</h2>
+          <div id="new-record-tag" class="new-record-tag" style="display: none;">🏆 NEW HIGH SCORE!</div>
+          
+          <div class="overlay-stats">
+            <div class="stat-item">
+              <div class="stat-title">Score</div>
+              <div id="final-score" class="stat-number">0</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-title">High Score</div>
+              <div id="best-score" class="stat-number">0</div>
+            </div>
+          </div>
+
+          <button id="restart-btn" class="btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+            </svg>
+            Play Again
+          </button>
+        </div>
+      </main>
+
+      <!-- Quick Control Bar -->
+      <div class="control-bar">
+        <button id="quick-pause-btn" class="control-bar-btn" title="Pause Game">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="6" y="4" width="4" height="16"></rect>
+            <rect x="14" y="4" width="4" height="16"></rect>
+          </svg>
+          Pause
+        </button>
+
+        <button id="quick-restart-btn" class="control-bar-btn" title="Restart Game">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M23 4v6h-6"></path>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+          Restart
+        </button>
+      </div>
+
+      <!-- Mobile Virtual D-Pad -->
+      <nav class="dpad-container" aria-label="Mobile Game Controls">
+        <div class="dpad-row">
+          <button id="dpad-up" class="dpad-btn" aria-label="Move Up">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <polyline points="18 15 12 9 6 15"></polyline>
+            </svg>
+          </button>
+        </div>
+        <div class="dpad-row">
+          <button id="dpad-left" class="dpad-btn" aria-label="Move Left">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+          <div class="dpad-center">
+            <div class="dpad-center-dot"></div>
+          </div>
+          <button id="dpad-right" class="dpad-btn" aria-label="Move Right">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+        <div class="dpad-row">
+          <button id="dpad-down" class="dpad-btn" aria-label="Move Down">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+        </div>
+      </nav>
+
+      <!-- Desktop & Mobile Instructions Footnote -->
+      <footer class="instructions-footer">
+        <p><strong>Desktop:</strong> Use <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> or <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> &bull; <kbd>Space</kbd> Pause &bull; <kbd>R</kbd> Restart</p>
+        <p><strong>Mobile:</strong> Swipe directly on canvas or tap the directional buttons</p>
+      </footer>
+    </div>
+
+    <!-- How To Play Modal -->
+    <div id="help-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modal-title" class="modal-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            How to Play
+          </h3>
+          <button id="close-help-btn" class="modal-close-btn" aria-label="Close dialog">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="rule-group">
+            <div class="rule-title">🍎 Red Apples (+10 pts)</div>
+            <div class="rule-desc">Eat apples to grow your snake and increase your score. Every 5 apples eaten summons a special bonus!</div>
+          </div>
+          <div class="rule-group">
+            <div class="rule-title">⭐ Golden Bonus (+50 pts)</div>
+            <div class="rule-desc">A shimmering star appears for 6 seconds. Grab it fast before the top countdown timer runs out!</div>
+          </div>
+          <div class="rule-group">
+            <div class="rule-title">💀 Collision Rules</div>
+            <div class="rule-desc">Don't run into walls or bite your own tail. High score is saved automatically to your device.</div>
+          </div>
+          <div class="rule-group">
+            <div class="rule-title">📱 Controls</div>
+            <div class="rule-desc">On desktop, use Arrow Keys or W/A/S/D. On mobile phones & tablets, swipe anywhere on the board or tap the touch buttons below.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Script (Vanilla JavaScript - Static & Module Compatible) -->
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>

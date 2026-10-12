@@ -1,0 +1,6 @@
+{
+  "name": "Snake Game",
+  "description": "Classic arcade Snake Game playable on desktop and mobile browsers, ready for static deployment on GitHub Pages.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
